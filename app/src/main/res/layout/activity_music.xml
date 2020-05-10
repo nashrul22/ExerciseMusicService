@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayoutut
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -8,19 +7,20 @@
     android:orientation="vertical"
     android:padding="5dp">
 
-<TextView
-    android:id="@+id/musicTitle"
-    android:layout_widht="fill_parent"
-    android:layout_height="wrap_content"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:textColor="#FFFFFF99"/>
+    <TextView
+        android:id="@+id/musicTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF99"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
     <TextView
         android:id="@+id/musicArtis"
-        android:layout_widht="fill_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="#FFFFFF99"/>
+        android:textColor="#FFFFFF99"
+        android:textSize="18sp" />
 
 
-</LinearLayoutut>
+</LinearLayout>

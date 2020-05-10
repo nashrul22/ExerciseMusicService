@@ -26,34 +26,36 @@ public class MainActivity extends AppCompatActivity {
 
         songView = (ListView) findViewById(R.id.listSong);
         songList = new ArrayList<Music>();
-        getMusicList();
+
 
         MusicAdapter songAdt = new MusicAdapter(this, songList);
         songView.setAdapter(songAdt);
 
-
+        getMusicList();
         Collections.sort(songList, new Comparator<Music>(){
            public int compare(Music a, Music b){
                return a.getTitle().compareTo(b.getTitle());
            }
         });
 
+
     }
+
 
     public void getMusicList(){
         ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
         if (musicCursor != null && musicCursor.moveToFirst()){
             int titleColumn = musicCursor.getColumnIndex(
-                    MediaStore.Audio.Media.TITLE
+                    android.provider.MediaStore.Audio.Media.TITLE
             );
             int idColumn = musicCursor.getColumnIndex(
-                    MediaStore.Audio.Media._ID
+                    android.provider.MediaStore.Audio.Media._ID
             );
             int artisColumn = musicCursor.getColumnIndex(
-                    MediaStore.Audio.Media.ARTIST
+                    android.provider.MediaStore.Audio.Media.ARTIST
             );
 
             do {
