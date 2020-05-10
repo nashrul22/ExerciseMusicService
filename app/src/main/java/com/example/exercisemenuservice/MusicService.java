@@ -20,6 +20,8 @@ public class MusicService extends Service implements
     private ArrayList<Music> songs;
     private int songPosn;
 
+    private final IBinder musicBind = new MusicBinder();
+
 
     public void initMusicPlayer(){
         player.setWakeMode(getApplicationContext(),
@@ -44,8 +46,15 @@ public class MusicService extends Service implements
 
     @Nullable
     @Override
-    public IBinder onBind(Intent arg0) {
-        return null;
+    public IBinder onBind(Intent intent) {
+        return musicBind;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        player.stop();
+        player.release();
+        return false;
     }
 
     @Override
