@@ -1,6 +1,8 @@
 package com.example.exercisemenuservice;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.exercisemenuservice.MusicService.MusicBinder;
 
 import android.content.ComponentName;
@@ -12,6 +14,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.content.Context;
 
@@ -43,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
         songView.setAdapter(songAdt);
 
         getMusicList();
-        Collections.sort(songList, new Comparator<Music>(){
-           public int compare(Music a, Music b){
-               return a.getTitle().compareTo(b.getTitle());
-           }
+        Collections.sort(songList, new Comparator<Music>() {
+            public int compare(Music a, Music b) {
+                return a.getTitle().compareTo(b.getTitle());
+            }
         });
 
 
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (playIntent==null){
+        if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
@@ -65,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicBinder binder = (MusicBinder)service;
+            MusicBinder binder = (MusicBinder) service;
 
             musicSrv = binder.getService();
 
@@ -75,17 +79,40 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-musicBound = false;
+            musicBound = false;
         }
     };
 
 
-    public void getMusicList(){
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+       switch (item.getItemId()){
+           case R.id.shuffle:
+
+           break;
+           case  R.id.stop:
+           stopService(playIntent);
+           musicSrv = null;
+           System.exit(0);
+           break;
+       }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void songPicked(View view) {
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        musicSrv.playSong();
+    }
+
+
+    public void getMusicList() {
         ContentResolver musicResolver = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
-        if (musicCursor != null && musicCursor.moveToFirst()){
+        if (musicCursor != null && musicCursor.moveToFirst()) {
             int titleColumn = musicCursor.getColumnIndex(
                     android.provider.MediaStore.Audio.Media.TITLE
             );

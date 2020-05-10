@@ -1,12 +1,15 @@
 package com.example.exercisemenuservice;
 
 import android.app.Service;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 
 import java.util.ArrayList;
 
@@ -44,6 +47,27 @@ public class MusicService extends Service implements
     }
 
 
+    public void playSong(){
+        player.reset();
+
+        Music playSong = songs.get(songPosn);
+
+        long currSong = playSong.getID();
+
+        Uri trackUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                currSong
+        );
+
+        try {
+            player.setDataSource(getApplicationContext(), trackUri);
+        }
+        catch (Exception e){
+            log.e("MUSIC SERVICE", "Error setting data source", e);
+        }
+        player.prepareAsync();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -80,6 +104,11 @@ public class MusicService extends Service implements
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        mp.start();
 
+    }
+
+    public void setSong(int songIndex){
+        songPosn = songIndex;
     }
 }
