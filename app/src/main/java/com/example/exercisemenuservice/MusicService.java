@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import androidx.annotation.Nullable;
 
 public class MusicService extends Service implements
-    MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-    MediaPlayer.OnCompletionListener {
+        MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
+        MediaPlayer.OnCompletionListener {
 
     private MediaPlayer player;
     private ArrayList<Music> songs;
@@ -28,7 +28,7 @@ public class MusicService extends Service implements
     private Log log;
 
 
-    public void initMusicPlayer(){
+    public void initMusicPlayer() {
         player.setWakeMode(getApplicationContext(),
                 PowerManager.PARTIAL_WAKE_LOCK);
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -38,18 +38,18 @@ public class MusicService extends Service implements
         player.setOnErrorListener(this);
     }
 
-    public void setList(ArrayList<Music> theSongs){
+    public void setList(ArrayList<Music> theSongs) {
         songs = theSongs;
     }
 
     public class MusicBinder extends Binder {
-        MusicService getService(){
+        MusicService getService() {
             return MusicService.this;
         }
     }
 
 
-    public void playSong(){
+    public void playSong() {
         player.reset();
 
         Music playSong = songs.get(songPosn);
@@ -63,8 +63,7 @@ public class MusicService extends Service implements
 
         try {
             player.setDataSource(getApplicationContext(), trackUri);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             log.e("MUSIC SERVICE", "Error setting data source", e);
         }
         player.prepareAsync();
@@ -86,12 +85,11 @@ public class MusicService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
-        songPosn=0;
+        songPosn = 0;
         player = new MediaPlayer();
 
         initMusicPlayer();
     }
-
 
 
     @Override
@@ -110,20 +108,10 @@ public class MusicService extends Service implements
 
     }
 
-    public void setSong(int songIndex){
+    public void setSong(int songIndex) {
         songPosn = songIndex;
     }
 
-    public void playSong(){
-        player.reset();
 
-        Music playSong = songs.get(songPosn);
-
-        long currSong = playSong.getID();
-
-        Uri trackUri = ContentUris.withAppendedId(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                currSong
-        );
-    }
 }
+
