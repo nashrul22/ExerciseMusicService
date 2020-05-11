@@ -37,6 +37,9 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     private Intent playIntent;
     private boolean musicBound = false;
 
+    private MusicController controller;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,14 +52,36 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         MusicAdapter songAdt = new MusicAdapter(this, songList);
         songView.setAdapter(songAdt);
 
-        getMusicList();
+
         Collections.sort(songList, new Comparator<Music>() {
             public int compare(Music a, Music b) {
                 return a.getTitle().compareTo(b.getTitle());
             }
         });
 
+        setController();
+        getMusicList();
 
+    }
+
+    public void setController() {
+        controller = new MusicController(this);
+
+        controller.setPrevNextListeners(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playNext();
+            }
+        }, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playPrev();
+            }
+        });
+
+        controller.setMediaPlayer(this);
+        controller.setAnchorView(findViewById(R.id.listSong));
+        controller.setEnabled(true);
     }
 
     @Override
@@ -89,16 +114,16 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-       switch (item.getItemId()){
-           case R.id.shuffle:
+        switch (item.getItemId()) {
+            case R.id.shuffle:
 
-           break;
-           case  R.id.stop:
-           stopService(playIntent);
-           musicSrv = null;
-           System.exit(0);
-           break;
-       }
+                break;
+            case R.id.stop:
+                stopService(playIntent);
+                musicSrv = null;
+                System.exit(0);
+                break;
+        }
 
 
         return super.onOptionsItemSelected(item);
@@ -146,31 +171,41 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     @Override
     public void start() {
-
+musicSrv.go();
     }
 
     @Override
     public void pause() {
-
+musicSrv.pausePlayer();
     }
 
     @Override
     public int getDuration() {
-        return 0;
+        if ( musicSrv != null &amp;&amp;
+        musicBound &amp;&amp;
+        musicSrv.isPng())
+        return musicSrv.getDur();
+  else return 0;
     }
 
     @Override
     public int getCurrentPosition() {
-        return 0;
+        if ( musicSrv != null & amp;&amp;
+        musicBound &amp;&amp;
+        musicSrv.isPng())
+        return musicSrv.getPosn();
+  else return 0;
     }
 
     @Override
     public void seekTo(int pos) {
-
+musicSrv.seek(pos);
     }
 
     @Override
     public boolean isPlaying() {
+        if(musicSrv!=null &amp;&amp; musicBound)
+        return musicSrv.isPng();
         return false;
     }
 
@@ -181,21 +216,32 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     @Override
     public boolean canPause() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canSeekBackward() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canSeekForward() {
-        return false;
+        return true;
     }
 
     @Override
     public int getAudioSessionId() {
         return 0;
+    }
+
+    private void playNext() {
+        musicSrv.playNext();
+        controller.show(0);
+    }
+
+    //play previous
+    private void playPrev() {
+        musicSrv.playPrev();
+        controller.show(0);
     }
 }
