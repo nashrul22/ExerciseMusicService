@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import androidx.annotation.Nullable;
 
@@ -26,6 +27,9 @@ public class MusicService extends Service implements
 
     private final IBinder musicBind = new MusicBinder();
     private Log log;
+
+    private boolean shuffle=false;
+    private Random rand;
 
 
     public void initMusicPlayer() {
@@ -89,6 +93,12 @@ public class MusicService extends Service implements
         player = new MediaPlayer();
 
         initMusicPlayer();
+
+        rand = new Random();
+    }
+    public void setShuffle(){
+        if (shuffle) shuffle=false;
+        else shuffle=true;
     }
 
 
@@ -138,12 +148,21 @@ public int getPosn(){
 
     public void playPrev(){
         songPosn--;
-        if(songPosn&lt;0) songPosn=songs.size()-1;
+        if(songPosn < 0) songPosn=songs.size()-1;
         playSong();
     }
     public void playNext(){
-        songPosn++;
-        if(songPosn&gt;=songs.size()) songPosn=0;
+        if(shuffle){
+            int newSong = songPosn;
+            while(newSong==songPosn){
+                newSong=rand.nextInt(songs.size());
+            }
+            songPosn=newSong;
+        }
+        else{
+            songPosn++;
+            if(songPosn>=songs.size()) songPosn=0;
+        }
         playSong();
     }
 }

@@ -1,31 +1,29 @@
 package com.example.exercisemenuservice;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.widget.MediaController.MediaPlayerControl;
-
-import com.example.exercisemenuservice.MusicService.MusicBinder;
-
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.content.Context;
+import android.widget.MediaController.MediaPlayerControl;
+
+import com.example.exercisemenuservice.MusicService.MusicBinder;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
+
+import androidx.annotation.NonNull;
 
 public class MainActivity extends Activity implements MediaPlayerControl {
 
@@ -38,6 +36,10 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     private boolean musicBound = false;
 
     private MusicController controller;
+
+
+    private boolean shuffle=false;
+    private Random rand;
 
 
     @Override
@@ -60,9 +62,18 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         });
 
         setController();
-        getMusicList();
+        getSongList();
+
+        rand = new Random();
 
     }
+
+    public void setShuffle(){
+        if (shuffle) shuffle=false;
+        else shuffle=true;
+    }
+
+
 
     public void setController() {
         controller = new MusicController(this);
@@ -106,17 +117,22 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
+        public void onServiceDisconnected(ComponentName name)
+        {
             musicBound = false;
         }
     };
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_menu, menu);
+        return true;
+    }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.shuffle:
-
                 break;
             case R.id.stop:
                 stopService(playIntent);
@@ -142,70 +158,42 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     }
 
 
-    public void getMusicList() {
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            int titleColumn = musicCursor.getColumnIndex(
-                    android.provider.MediaStore.Audio.Media.TITLE
-            );
-            int idColumn = musicCursor.getColumnIndex(
-                    android.provider.MediaStore.Audio.Media._ID
-            );
-            int artisColumn = musicCursor.getColumnIndex(
-                    android.provider.MediaStore.Audio.Media.ARTIST
-            );
-
-            do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtis = musicCursor.getString(artisColumn);
-                songList.add(new Music(thisId, thisTitle, thisArtis));
-            }
-            while (musicCursor.moveToNext());
-        }
-
-    }
-
     @Override
     public void start() {
-musicSrv.go();
+        musicSrv.go();
     }
 
     @Override
     public void pause() {
-musicSrv.pausePlayer();
+        musicSrv.pausePlayer();
     }
 
     @Override
     public int getDuration() {
-        if ( musicSrv != null &amp;&amp;
-        musicBound &amp;&amp;
-        musicSrv.isPng())
-        return musicSrv.getDur();
-  else return 0;
+        if (musicSrv != null &&
+                musicBound &&
+                musicSrv.isPng())
+            return musicSrv.getDur();
+        else return 0;
     }
 
     @Override
     public int getCurrentPosition() {
-        if ( musicSrv != null & amp;&amp;
-        musicBound &amp;&amp;
-        musicSrv.isPng())
-        return musicSrv.getPosn();
-  else return 0;
+        if (musicSrv != null && musicBound && musicSrv.isPng())
+            return musicSrv.getPosn();
+        else return 0;
     }
 
     @Override
     public void seekTo(int pos) {
-musicSrv.seek(pos);
+        musicSrv.seek(pos);
     }
 
     @Override
     public boolean isPlaying() {
-        if(musicSrv!=null &amp;&amp; musicBound)
-        return musicSrv.isPng();
+        if (musicSrv != null &&
+                musicBound)
+            return musicSrv.isPng();
         return false;
     }
 
@@ -244,4 +232,32 @@ musicSrv.seek(pos);
         musicSrv.playPrev();
         controller.show(0);
     }
+
+    public void getSongList() {
+        ContentResolver musicResolver = getContentResolver();
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            int titleColumn = musicCursor.getColumnIndex(
+                    android.provider.MediaStore.Audio.Media.TITLE
+            );
+            int idColumn = musicCursor.getColumnIndex(
+                    android.provider.MediaStore.Audio.Media._ID
+            );
+            int artisColumn = musicCursor.getColumnIndex(
+                    android.provider.MediaStore.Audio.Media.ARTIST
+            );
+
+            do {
+                long thisId = musicCursor.getLong(idColumn);
+                String thisTitle = musicCursor.getString(titleColumn);
+                String thisArtis = musicCursor.getString(artisColumn);
+                songList.add(new Music(thisId, thisTitle, thisArtis));
+            }
+            while (musicCursor.moveToNext());
+        }
+
+    }
 }
+
