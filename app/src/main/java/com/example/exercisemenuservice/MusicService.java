@@ -10,6 +10,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -24,6 +25,7 @@ public class MusicService extends Service implements
     private int songPosn;
 
     private final IBinder musicBind = new MusicBinder();
+    private Log log;
 
 
     public void initMusicPlayer(){
@@ -110,5 +112,18 @@ public class MusicService extends Service implements
 
     public void setSong(int songIndex){
         songPosn = songIndex;
+    }
+
+    public void playSong(){
+        player.reset();
+
+        Music playSong = songs.get(songPosn);
+
+        long currSong = playSong.getID();
+
+        Uri trackUri = ContentUris.withAppendedId(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                currSong
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.example.exercisemenuservice;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.MediaController.MediaPlayerControl;
 
 import com.example.exercisemenuservice.MusicService.MusicBinder;
 
@@ -99,6 +100,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicSrv = null;
+        super.onDestroy();
     }
 
     public void songPicked(View view) {
