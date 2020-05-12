@@ -41,6 +41,8 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     private boolean shuffle=false;
     private Random rand;
 
+    private boolean paused=false, playbackPaused=false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +70,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     }
 
-    public void setShuffle(){
-        if (shuffle) shuffle=false;
-        else shuffle=true;
-    }
+
 
 
 
@@ -133,6 +132,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.shuffle:
+                musicSrv.setShuffle();
                 break;
             case R.id.stop:
                 stopService(playIntent);
@@ -155,6 +155,11 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     public void songPicked(View view) {
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
+        if (playbackPaused){
+            setController();
+            playbackPaused = false;
+        }
+        controller.show(0);
     }
 
 
@@ -166,6 +171,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     @Override
     public void pause() {
         musicSrv.pausePlayer();
+        playbackPaused= true;
     }
 
     @Override
@@ -224,13 +230,41 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     private void playNext() {
         musicSrv.playNext();
+        if (playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
     }
 
     //play previous
     private void playPrev() {
         musicSrv.playPrev();
+        if (playbackPaused){
+            setController();
+            playbackPaused=false;
+        }
         controller.show(0);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        paused = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (paused){
+            setController();
+            paused=false;
+        }
+    }
+
+    public void onStop() {
+        super.onStop();
+        controller.hide();
     }
 
     public void getSongList() {
